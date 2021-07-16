@@ -44,7 +44,6 @@ namespace NotesAPI.Controllers {
 
             var obj = CreatedAtRoute("GetNotes", new { noteId = notes.Id }, notes);
 
-            //return obj;
             return Ok();
         }
 
