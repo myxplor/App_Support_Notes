@@ -19,7 +19,7 @@ namespace NotesAPI.Controllers {
         public NotesController(ApplicationDbContext db) {
             _db = db;
         }
-
+        
         [HttpPost]
         [ProducesResponseType(201, Type = typeof(List<Notes>))]
         [ProducesResponseType(StatusCodes.Status201Created)]
