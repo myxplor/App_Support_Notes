@@ -54,10 +54,58 @@ namespace NotesAPI.Controllers {
             return _db.Notes.OrderBy(a => a.Created).ToList();
         }
 
+        [HttpPatch("{NoteId:int}", Name = "UpdateNote")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult UpdateNote(Notes note) {
+            if (!NoteExists(note.Id)) {
+                return NotFound();
+            }
+            if (note == null) {
+                return BadRequest();
+            }
+            try {
+                _db.Notes.Update(note);
+            }
+            catch (Exception e) {
+                ModelState.AddModelError("", $"Something went wrong while removing the record");
+                _db.Dispose();
+                return StatusCode(500, ModelState);
+            }
+            Save();
+            return NoContent();
+        }
+
+        [HttpDelete("{NoteId:int}", Name = "DeleteNote")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult DeleteExpense(int NoteId) {
+            if (!NoteExists(NoteId)) {
+                return NotFound();
+            }
+            var expenseToRemove = _db.Notes.SingleOrDefault(x => x.Id == NoteId);
+            try {
+                _db.Notes.Remove(expenseToRemove);
+            }
+            catch (Exception e) {
+                ModelState.AddModelError("", $"Something went wrong while removing the record");
+                _db.Dispose();
+                return StatusCode(500, ModelState);
+            }
+            Save();
+            return NoContent();
+        }
 
         [NonAction]
         private bool Save() {
             return _db.SaveChanges() >= 0 ? true : false;
+        }
+
+        [NonAction]
+        private bool NoteExists(int noteId) {
+            return _db.Notes.Any(a => a.Id == noteId);
         }
 
     }
